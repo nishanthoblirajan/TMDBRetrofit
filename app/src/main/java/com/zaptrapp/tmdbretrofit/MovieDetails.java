@@ -13,32 +13,28 @@ import com.zaptrapp.tmdbretrofit.RetroFit.Movie;
 
 public class MovieDetails extends AppCompatActivity {
 
-    private TextView detailsTitle;
-    private TextView detailsHomepage;
-    private TextView detailsBudget;
-    private TextView detailsTagline;
-    private TextView detailsVote;
-    private ImageView detailsPoster;
 
     public static final String IMAGE_URL_BASE = "http://image.tmdb.org/t/p/w500/";
+    public static final String IMAGE_URL_ORIGINAL_BASE = "http://image.tmdb.org/t/p/original/";
     private AppBarLayout appbar;
     private ImageView appBarImage;
     private Toolbar toolbar;
+    private ImageView detailsPoster;
+    private TextView detailsReleaseDate;
+    private TextView detailsOverview;
+    private TextView detailsAdult;
 
     private void initView() {
-        detailsTitle = (TextView) findViewById(R.id.detailsTitle);
-        detailsHomepage = (TextView) findViewById(R.id.detailsHomepage);
-        detailsBudget = (TextView) findViewById(R.id.detailsBudget);
-        detailsTagline = (TextView) findViewById(R.id.detailsTagline);
-        detailsVote = (TextView) findViewById(R.id.detailsVote);
-        detailsPoster = (ImageView) findViewById(R.id.detailsPoster);
         appbar = (AppBarLayout) findViewById(R.id.appbar);
         appBarImage = (ImageView) findViewById(R.id.app_bar_image);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        detailsPoster = (ImageView) findViewById(R.id.detailsPoster);
+        detailsReleaseDate = (TextView) findViewById(R.id.detailsReleaseDate);
+        detailsOverview = (TextView) findViewById(R.id.detailsOverview);
+        detailsAdult = (TextView) findViewById(R.id.detailsAdult);
         setSupportActionBar(toolbar);
 //        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setTitle("Details");
-
     }
 
     @Override
@@ -55,12 +51,10 @@ public class MovieDetails extends AppCompatActivity {
         Log.d("dataToView", receivedMovie.toString());
         if (receivedMovie != null) {
             toolbar.setTitle(receivedMovie.getTitle());
-            detailsTitle.setText(receivedMovie.getTitle());
-            detailsHomepage.setText(String.valueOf(receivedMovie.getPopularity()));
-            detailsBudget.setText(receivedMovie.getOverview());
-            detailsTagline.setText(receivedMovie.getOriginal_language());
-            detailsVote.setText(String.valueOf(receivedMovie.getId()));
-            Glide.with(this).load(IMAGE_URL_BASE + receivedMovie.getPoster_path()).into(detailsPoster);
+            detailsReleaseDate.setText(String.valueOf(receivedMovie.getRelease_date()));
+            detailsOverview.setText(receivedMovie.getOverview());
+            detailsAdult.setText(receivedMovie.isAdult() ? "YES" : "NO");
+            Glide.with(this).load(IMAGE_URL_ORIGINAL_BASE + receivedMovie.getPoster_path()).into(detailsPoster);
             Glide.with(this).load(IMAGE_URL_BASE + receivedMovie.getBackdrop_path()).into(appBarImage);
         }
     }
