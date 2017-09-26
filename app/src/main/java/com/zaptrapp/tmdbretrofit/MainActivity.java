@@ -2,10 +2,9 @@ package com.zaptrapp.tmdbretrofit;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.zaptrapp.tmdbretrofit.Adapter.MovieAdapter;
 import com.zaptrapp.tmdbretrofit.RetroFit.ApiClient;
@@ -34,7 +33,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this,3));
+//        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL));
 
         ApiInterface apiInterface =
                 ApiClient.getClient().create(ApiInterface.class);
@@ -50,34 +50,42 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(TAG, "onResponse: "+movies.get(1).getTitle());
                 Log.d("Raw Data",response.raw().toString());
-                Toast.makeText(MainActivity.this, "received", Toast.LENGTH_SHORT).show();
                 Log.d("Top rated movies size ",movies.size()+" ");
             }
 
             @Override
             public void onFailure(Call<MovieResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Failure", Toast.LENGTH_SHORT).show();
+
 
             }
         });
 
 
-
-
-//        Call<Movie> number550 = apiInterface.getMovieDetails(550,API_KEY);
-//        number550.enqueue(new Callback<Movie>() {
-//            @Override
-//            public void onResponse(Call<Movie> call, Response<Movie> response) {
-//                Log.d("ID - 550 ",response.raw().toString());
-//                Log.d("ID - 550 ",response.body().getTitle());
+//        final List<Movie> movieList = new ArrayList<Movie>();
 //
-//            }
 //
-//            @Override
-//            public void onFailure(Call<Movie> call, Throwable t) {
+//        for (int i = 500;i<600;i++) {
+//            Call<Movie> number550 = apiInterface.getMovieDetails(i, API_KEY);
+//            final int finalI = i;
+//            number550.enqueue(new Callback<Movie>() {
+//                @Override
+//                public void onResponse(Call<Movie> call, Response<Movie> response) {
 //
-//            }
-//        });
+//                    movieList.add(response.body());
+//
+//                    Log.d(TAG, "onResponse: "+ finalI);
+//                }
+//
+//                @Override
+//                public void onFailure(Call<Movie> call, Throwable t) {
+//
+//                }
+//            });
+////        }
+//        Log.d(TAG, "onCreate: "+ "MovieAdapter");
+//        mMovieAdapter = new MovieAdapter(movieList);
+//        Log.d(TAG, "onCreate: "+ "setAdapter");
+//        mRecyclerView.setAdapter(mMovieAdapter);
 
     }
 }
