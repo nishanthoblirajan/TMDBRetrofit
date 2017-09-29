@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Top Rated" android:id="@+id/option_top_rated"/>
+    <item android:title="Most Popular" android:id="@+id/option_most_popular"/>
+    <item android:title="R Rated" android:id="@+id/option_r_rated"/>
+    <item android:title="Best of 2017" android:id="@+id/option_best_of_2017"/>
+</menu>
