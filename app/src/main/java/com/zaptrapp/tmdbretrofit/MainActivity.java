@@ -14,6 +14,16 @@ import com.zaptrapp.tmdbretrofit.RetroFit.MovieResponse;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,8 +35,20 @@ public class MainActivity extends AppCompatActivity {
     MovieAdapter mMovieAdapter;
     RecyclerView mRecyclerView;
 
+    //RxJava 2
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+
 
     private static final String API_KEY = "50b35f247a284a75b2d7f54c71519a3e";
+
+
+    @Override
+    protected void onDestroy() {
+        mCompositeDisposable.clear();
+        super.onDestroy();
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,53 +61,33 @@ public class MainActivity extends AppCompatActivity {
         ApiInterface apiInterface =
                 ApiClient.getClient().create(ApiInterface.class);
 
-        Call<MovieResponse> call = apiInterface.getTopRatedMovies(API_KEY);
-        call.enqueue(new Callback<MovieResponse>() {
-            @Override
-            public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+        Observable<MovieResponse> movieResponseObservable = apiInterface.getTopRatedMovies(API_KEY);
+        movieResponseObservable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<MovieResponse>() {
+                    @Override
+                    public void onNext(@NonNull MovieResponse movieResponse) {
+                        List<Movie> movies = movieResponse.getResults();
+                        mMovieAdapter = new MovieAdapter(movies);
+                        mRecyclerView.setAdapter(mMovieAdapter);
 
-                List<Movie> movies = response.body().getResults();
-                mMovieAdapter = new MovieAdapter(movies);
-                mRecyclerView.setAdapter(mMovieAdapter);
+                        Log.d(TAG, "onResponse: "+movies.get(1).getTitle());
+                        Log.d("Raw Data",movieResponse.toString());
+                        Log.d("Top rated movies size ",movies.size()+" ");
 
-                Log.d(TAG, "onResponse: "+movies.get(1).getTitle());
-                Log.d("Raw Data",response.raw().toString());
-                Log.d("Top rated movies size ",movies.size()+" ");
-            }
+                    }
 
-            @Override
-            public void onFailure(Call<MovieResponse> call, Throwable t) {
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.d("rxjava2 retrofit2","Error Occured");
 
+                    }
 
-            }
-        });
+                    @Override
+                    public void onComplete() {
 
-
-//        final List<Movie> movieList = new ArrayList<Movie>();
-//
-//
-//        for (int i = 500;i<600;i++) {
-//            Call<Movie> number550 = apiInterface.getMovieDetails(i, API_KEY);
-//            final int finalI = i;
-//            number550.enqueue(new Callback<Movie>() {
-//                @Override
-//                public void onResponse(Call<Movie> call, Response<Movie> response) {
-//
-//                    movieList.add(response.body());
-//
-//                    Log.d(TAG, "onResponse: "+ finalI);
-//                }
-//
-//                @Override
-//                public void onFailure(Call<Movie> call, Throwable t) {
-//
-//                }
-//            });
-////        }
-//        Log.d(TAG, "onCreate: "+ "MovieAdapter");
-//        mMovieAdapter = new MovieAdapter(movieList);
-//        Log.d(TAG, "onCreate: "+ "setAdapter");
-//        mRecyclerView.setAdapter(mMovieAdapter);
+                    }
+                });
 
     }
 }
